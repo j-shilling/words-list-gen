@@ -1,3 +1,5 @@
+package com.shilling.utils.words;
+
 import org.kohsuke.args4j.Option;
 
 public class CLIArgs {

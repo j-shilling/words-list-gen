@@ -1,3 +1,5 @@
+package com.shilling.utils.words;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,8 +28,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 
-
-public class WhitakerScalper {
+public class ListGen {
 	private static String delimiter = "\\s";
 	
 	@SuppressWarnings("unchecked")
