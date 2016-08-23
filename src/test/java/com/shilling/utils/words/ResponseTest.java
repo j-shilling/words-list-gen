@@ -15,6 +15,7 @@ import com.google.common.io.Resources;
 public class ResponseTest {
 	private static String amantisSearch;
 	private static String mihiSearch;
+	private static String egoSearch;
 	
 	private String getResource(String filename) {
 		URL url = Resources.getResource(filename);
@@ -29,6 +30,7 @@ public class ResponseTest {
 	public ResponseTest() {
 		amantisSearch = getResource("search.amantis");
 		mihiSearch = getResource("search.mihi");
+		egoSearch = getResource("search.ego");
 	}
 
 	@Test
@@ -81,5 +83,22 @@ public class ResponseTest {
 		assertTrue (test.getEnDef().equals("I, me (PERS); myself (REFLEX);"));
 		assertTrue (test.getFormInfo().size() == 1);
 		assertTrue (test.getFormInfo().get(0).equals("m.ihi                PRON   5 1 DAT S C                 "));
+	}
+	
+	@Test
+	public void EgoTest() {
+		assertNotNull (egoSearch);
+		
+		List<Response> tests = Response.parseResponse(egoSearch);
+		assertNotNull (tests);
+		assertTrue (tests.size() == 1);
+		
+		Response test = tests.get(0);
+		
+		assertNotNull(test);
+		assertTrue (test.getLexicalInfo().equals("ego"));
+		assertTrue (test.getEnDef().equals("I, me (PERS); myself (REFLEX);"));
+		assertTrue (test.getFormInfo().size() == 1);
+		assertTrue (test.getFormInfo().get(0).equals("ego                  PRON   5 1 NOM S C                 "));
 	}
 }

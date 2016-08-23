@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 public class Entry implements Comparable<Entry> {
 	int frequency;
 	String word;
+	String def;
 	
 	public Entry (String line) {
 		String[] parsedLine = line.split(":");
@@ -38,7 +39,15 @@ public class Entry implements Comparable<Entry> {
 	}
 
 	public void setWord(String word) {
-		this.word = word;
+		this.word = new String(word);
+	}
+	
+	public String getDefinition() {
+		return def;
+	}
+	
+	public void setDefinition(String val) {
+		this.def = new String(val);
 	}
 
 	@Override
@@ -59,6 +68,8 @@ public class Entry implements Comparable<Entry> {
 	public boolean equals(Object obj) {
 		if (obj instanceof Entry) {
 			return this.compareTo((Entry)obj) == 0;
+		} else if (obj instanceof Response) {
+			return this.equals(((Response)obj).toEntry());
 		}
 		
 		return false;

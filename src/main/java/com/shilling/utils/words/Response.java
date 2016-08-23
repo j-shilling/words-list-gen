@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Response {
+public class Response implements Comparable<Response> {
 	public static List<Response> parseResponse(String txt) {
 		List<Response> ret = new ArrayList<Response>();
 		
@@ -31,15 +31,15 @@ public class Response {
 				if (formInfoMatcher.find()) {
 					rs.addFormInfo(line);
 				} else if (lexicalInfoMatcher.find()) {
-					String lex = line.split("  ")[0];
+					String lex = line.split("\\[[A-Z][A-Z][A-Z][A-Z][A-Z]\\]")[0].trim();
 					
-					if (lex.matches("[a-z]+")) {
-						rs.setLexicalInfo(lex);
-					} else {
+					if (lex.isEmpty()) {
 						lex = rs.getFormInfo().get(0).split("\\s")[0];
 						lex = lex.replaceAll("\\.", "");
+					} else {
+						lex = line.split("  ")[0];
 					}
-					rs.setLexicalInfo(line.split("  ")[0]);;
+					rs.setLexicalInfo(lex);;
 					rs.setEnDef(br.readLine());
 					
 					ret.add(rs);
@@ -71,23 +71,63 @@ public class Response {
 		return lexicalInfo;
 	}
 
-	public void setLexicalInfo(String lexicalInfo) {
-		this.lexicalInfo = new String(lexicalInfo);
+	private void setLexicalInfo(String lexicalInfo) {
+		this.lexicalInfo = new String(lexicalInfo.trim());
 	}
 
 	public String getEnDef() {
 		return enDef;
 	}
 
-	public void setEnDef(String enDef) {
-		this.enDef = new String(enDef);
+	private void setEnDef(String enDef) {
+		this.enDef = new String(enDef.trim());
 	}
 
 	public List<String> getFormInfo() {
 		return formInfo;
 	}
 
-	public void addFormInfo(String form) {
+	private void addFormInfo(String form) {
 		this.getFormInfo().add(form);
+	}
+	
+	public Entry toEntry() {
+		Entry ret = new Entry();
+		
+		ret.setWord(this.getLexicalInfo());
+		ret.setDefinition(this.getEnDef());
+		
+		return ret;
+	}
+
+	@Override
+	public int compareTo(Response that) {
+		return this.getLexicalInfo().toLowerCase().compareTo(that.getLexicalInfo().toLowerCase());
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Response) {
+			Response that = (Response) obj;
+			
+			return this.getLexicalInfo().equals(that.getLexicalInfo()) 
+					&& this.getEnDef().equals(that.getEnDef())
+					&& this.formInfo.equals(that.getFormInfo());
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("");
+		
+		for (String s : this.getFormInfo()) {
+			sb.append(s + System.lineSeparator());
+		}
+		sb.append(this.getLexicalInfo() + System.lineSeparator());
+		sb.append(this.getEnDef() + System.lineSeparator());
+		
+		return sb.toString();
 	}
 }

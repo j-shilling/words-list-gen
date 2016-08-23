@@ -13,9 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
@@ -85,30 +82,9 @@ public class ListGen {
 		
 		executor.setStreamHandler(psh);
 		
-		int exitValue = executor.execute(cmdLine);
+		executor.execute(cmdLine);
 		
 		return output.toString("UTF-8");
-	}
-	
-	private static List<String> parseWhitakerResponse(String response) {
-		if (response == null) {
-			return null;
-		}
-		
-		String[] lines = response.split(System.getProperty("line.separator"));
-		List<String> ret = new ArrayList<String>();
-		
-		for (String line : lines) {
-			Pattern p = Pattern.compile("^[a-zA-Z]+.*\\[.....\\].*");
-			Matcher m = p.matcher(line);
-			
-			if (m.find()) {
-				String[] subs = line.split("  ");
-				ret.add(subs[0]);
-			}
-		}
-		
-		return ret;
 	}
 	
 	private static int countTotalWords(String input) {
@@ -191,22 +167,21 @@ public class ListGen {
 				} else {
 					response = search(searchTerm);
 				}
-				List<String> rets = parseWhitakerResponse(response);
+				List<Response> rets = Response.parseResponse(response);
 				
 				if (rets != null) {
-					for (String word : rets) {
+					for (Response r : rets) {
 						boolean added = false;
 						for (Entry entry : results) {
-							if (entry.getWord().equals(word)) {
+							if (entry.getWord().equals(r.getLexicalInfo())) {
 								entry.incrementFrequency();
 								added = true;
 							}
 						}
 						
 						if (!added) {
-							Entry entry = new Entry();
+							Entry entry = r.toEntry();
 							entry.setFrequency(1);
-							entry.setWord(word);
 							results.add(entry);
 						}
 					}
