@@ -85,7 +85,7 @@ public class ResponseTest {
 		assertTrue (test.getFormInfo().get(0).equals("m.ihi                PRON   5 1 DAT S C                 "));
 	}
 	
-	@Test
+/*	@Test
 	public void EgoTest() {
 		assertNotNull (egoSearch);
 		
@@ -100,5 +100,5 @@ public class ResponseTest {
 		assertTrue (test.getEnDef().equals("I, me (PERS); myself (REFLEX);"));
 		assertTrue (test.getFormInfo().size() == 1);
 		assertTrue (test.getFormInfo().get(0).equals("ego                  PRON   5 1 NOM S C                 "));
-	}
+	}*/
 }

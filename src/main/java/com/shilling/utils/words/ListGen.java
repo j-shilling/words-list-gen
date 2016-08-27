@@ -26,6 +26,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 
 public class ListGen {
+	
 	private static String delimiter = "\\s";
 	
 	@SuppressWarnings("unchecked")
@@ -87,26 +88,6 @@ public class ListGen {
 		return output.toString("UTF-8");
 	}
 	
-	private static int countTotalWords(String input) {
-		try {
-			File file = new File(input);
-			Scanner sc = new Scanner (new FileInputStream(file));
-			sc.useDelimiter(delimiter);
-			int count = 0;
-				
-			while(sc.hasNext()) {
-				sc.next();
-				count++;
-			}
-			
-			sc.close();
-			return count;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return 0;
-	}
-	
 	private static void showProgressBar(int percent) {
 		StringBuilder bar = new StringBuilder("[");
 		
@@ -125,35 +106,16 @@ public class ListGen {
 	}
 
 	public static void main(String[] args) {
-		CLIArgs opts = new CLIArgs();
-		CmdLineParser parser = new CmdLineParser(opts);
+		CLIArgs opts = CLIArgs.getOpts(args);
+		
 		int current = 0;
 		
 		try {
-			parser.parseArgument(args);
-		} catch (CmdLineException e) {
-			System.err.println(e.getMessage());
-			parser.printUsage(System.err);
-		}
-		
-		if (opts.getInput() == null) {
-			System.out.println("Input file required!");
-			System.exit(1);
-		}
-		
-		if (opts.getOutput() == null) {
-			System.out.println("Output file required!");
-			System.exit(1);
-		}
-		
-		int total = countTotalWords(opts.getInput());
-		
-		try {
-			Scanner input = new Scanner(new File(opts.getInput()));
+			UserInput input = opts.getUserInput();
 
 			List<Entry> results = new ArrayList<Entry>();
-			input.useDelimiter(delimiter);
 			
+			int total = input.length();
 			System.out.println("Looking up " + total + " words:");
 			
 			while (input.hasNext()) {
@@ -163,7 +125,7 @@ public class ListGen {
 				String response = new String ("");
 				String searchTerm = input.next();
 				if (opts.getExec() != null) {
-					response = search(opts.getExec(), searchTerm);
+					response = search(opts.getExec().toString(), searchTerm);
 				} else {
 					response = search(searchTerm);
 				}
@@ -193,9 +155,9 @@ public class ListGen {
 			Collections.sort(results);
 			
 			try {
-			    Files.createFile(Paths.get(opts.getOutput()));
+			    Files.createFile(opts.getOutput());
 			} catch (FileAlreadyExistsException ignored) {
-				PrintWriter pw = new PrintWriter(opts.getOutput());
+				PrintWriter pw = new PrintWriter(opts.getOutput().toFile());
 				pw.close();
 			}
 			
@@ -204,9 +166,8 @@ public class ListGen {
 			for (Entry entry : results) {
 				current ++;
 				showProgressBar((int)Math.round(current * 100.0 / results.size()));
-				entry.writeToFile(opts.getOutput());
+				entry.writeToFile(opts.getOutput().toString());
 			}
-			input.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
