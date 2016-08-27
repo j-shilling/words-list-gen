@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,21 +58,21 @@ public class CLIArgs {
 				required = false,
 				usage = "input file to draw words from",
 				handler = MultiPathOptionHandler.class)
-		private List<Path> input;
+		private List<Path> input = new ArrayList<Path> ();
 		
 		@Option(name = "-o",
 				aliases = {"--output"},
 				metaVar = "<file>",
 				required = false,
 				usage = "output file to write words to")
-		private Path output;
+		private Path output = Paths.get("");
 		
 		@Option(name = "-w",
 				aliases = {"--words"},
 				metaVar = "<file>",
 				required = false,
 				usage = "path to the Whitaker's Words executable")
-		private Path exec;
+		private Path exec = Paths.get("");
 		
 		@Option(name = "-x",
 				aliases = {"--exclude"},
@@ -79,34 +80,36 @@ public class CLIArgs {
 				required = false,
 				usage = "file of words to exlude from output",
 				handler = MultiPathOptionHandler.class)
-		private List<Path> excl;
+		private List<Path> excl = new ArrayList<Path> ();
 		
 		@Option(name = "-v",
 				aliases = {"verbose"},
 				required = false,
 				usage = "turn on verbose error and loggin messages")
-		private boolean verbose;
+		private boolean verbose = false;
 		
 		@Option(name = "-c",
 				aliases = {"--config"},
 				required = false,
 				forbids = {"-i", "-o", "-e", "-x"},
 				usage = "enter configuaration mode")
-		private boolean config;
+		private boolean config = false;
 		
 		@Option(name = "-u",
 				aliases = {"--user"},
 				required = false,
 				depends = {"-c"},
+				forbids = {"-g"},
 				usage = "edit user configuration")
-		private boolean user;
+		private boolean user = false;
 		
 		@Option(name = "-g",
 				aliases = {"--global"},
 				required = false,
 				depends = {"-c"},
+				forbids = {"-u"},
 				usage = "edit global configuration")
-		private boolean global;
+		private boolean global = false;
 		
 		@Option(name = "-?",
 				aliases = "--help",
@@ -114,7 +117,7 @@ public class CLIArgs {
 				forbids = {"-i", "-o", "-e", "-x", "-c", "-u", "-g"},
 				help = true,
 				usage = "print usage instructions")
-		private boolean help;
+		private boolean help = false;
 
 		@Argument
 		private List<String> args = new ArrayList<String> ();
@@ -191,7 +194,7 @@ public class CLIArgs {
 			}
 			
 			Path output = this.getOutput();
-			if (output != null) {
+			if ((output != null) && (!output.toString().isEmpty())) {
 				if (output.toFile().exists()) {
 					if (!Files.isWritable(output)) {
 						System.err.println("Error: Cannot overwrite file: " + output.toString());
@@ -228,6 +231,19 @@ public class CLIArgs {
 		
 		public UserInput getUserInput() {
 			return new UserInput(this.getInput(), this.getArgs());
+		}
+		
+		public OutputFilter getOutputFiler() {
+			Path output = this.getOutput();
+			if (output != null) {
+				return new FileOutput(output);
+			} else {
+				return null;
+			}
+		}
+		
+		public WordSearcher getWordSearcher() {
+			return new WordSearcher(this.getExec());
 		}
 	}
 

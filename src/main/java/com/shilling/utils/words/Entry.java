@@ -67,7 +67,10 @@ public class Entry implements Comparable<Entry> {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Entry) {
-			return this.compareTo((Entry)obj) == 0;
+			Entry that = (Entry) obj;
+			
+			return this.getWord().toLowerCase().equals(
+					that.getWord().toLowerCase());
 		} else if (obj instanceof Response) {
 			return this.equals(((Response)obj).toEntry());
 		}
