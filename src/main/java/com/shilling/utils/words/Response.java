@@ -12,18 +12,20 @@ import java.util.regex.Pattern;
 
 public class Response implements Comparable<Response> {
 	public static List<Response> parseResponse(String txt) {
-		List<Response> ret = new ArrayList<Response>();
+		List<Response> ret = null;
 		
-		InputStream is = new ByteArrayInputStream(txt.getBytes());
-		InputStreamReader ir = new InputStreamReader(is);
-		BufferedReader br = new BufferedReader(ir);
-		
-		Pattern formInfoLine = Pattern.compile("[a-zA-Z]+\\.[a-zA-Z]+");
-		Pattern lexicalInfoLine = Pattern.compile("\\[[A-Z][A-Z][A-Z][A-Z][A-Z]\\]");
-		
-		String line = null;
-		Response rs = new Response();
 		try {
+			ret = new ArrayList<Response>();
+			InputStream is = new ByteArrayInputStream(txt.getBytes());
+			InputStreamReader ir = new InputStreamReader(is);
+			BufferedReader br = new BufferedReader(ir);
+			
+			Pattern formInfoLine = Pattern.compile("[a-zA-Z]+\\.[a-zA-Z]+");
+			Pattern lexicalInfoLine = Pattern.compile("\\[[A-Z][A-Z][A-Z][A-Z][A-Z]\\]");
+			
+			String line = null;
+			Response rs = new Response();
+		
 			while ((line = br.readLine()) != null) {
 				Matcher formInfoMatcher = formInfoLine.matcher(line);
 				Matcher lexicalInfoMatcher = lexicalInfoLine.matcher(line);
@@ -51,10 +53,12 @@ public class Response implements Comparable<Response> {
 			ir.close();
 			is.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Messenger.instance.err(e.getMessage());
+		} catch (Exception e) {
+			Messenger.instance.err(e.getMessage());
+		} finally {
+			return ret;
 		}
-		
-		return ret;
 	}
 	
 	String lexicalInfo;

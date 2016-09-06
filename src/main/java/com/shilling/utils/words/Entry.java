@@ -15,6 +15,7 @@ public class Entry implements Comparable<Entry> {
 		
 		setFrequency(Integer.parseInt(parsedLine[0]));
 		setWord(new String(parsedLine[1]));
+		setDefinition(new String(parsedLine[2]));
 	}
 	
 	public Entry () {
@@ -52,7 +53,7 @@ public class Entry implements Comparable<Entry> {
 
 	@Override
 	public String toString() {
-		return Integer.toString(frequency) + ":" + word;
+		return Integer.toString(this.getFrequency()) + ":" + this.getWord() + ":" + this.getDefinition();
 	}
 
 	@Override
